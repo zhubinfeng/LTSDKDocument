@@ -5,7 +5,7 @@
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>iOS支付模块文档简化后</title>
+<title>LTGameSDK登录文档Core版</title>
 
 
 <style type="text/css">
@@ -328,236 +328,203 @@ kbd {
 
 <body>
 
-<p><center><H1>iOS支付模块文档</h1></center></p>
+<p><center><H1>LTSDK登录模块文档</h1></center></p>
+
+<h2 id="toc_0">第一步,添加库</h2>
+
+<p>1，cocopods安装三方库 </p>
 
 <blockquote>
-<h3 id="toc_0">1、支付模块流程说明</h3>
+<p>1集成核心库（必须），在podfile文件中添加如下代码</p>
+
+<div><pre><code class="language-none">use_frameworks!
+pod &#39;LTGameSDKCore&#39;</code></pre></div>
+
+<p>2按需导入对应的第三方库</p>
+
+<div><pre><code class="language-none">pod &#39;LTGameSDKCore/LTSDKPlatforms/Facebook&#39;
+pod &#39;LTGameSDKCore/LTSDKPlatforms/Google&#39;</code></pre></div>
+
+<p>3按需导入对应的UI库（具体地址请在线沟通）</p>
+
+<div><pre><code class="language-none">pod &#39;LTGameSDKUIYXLHW&#39;</code></pre></div>
 </blockquote>
 
-<p>为保证支付安全性，不出现掉单、漏单的情况，<code>SDK</code>采用了苹果验证和<code>LT</code>服务器二次验证的方式，主要业务逻辑为：</p>
+<p>2，info.plist添加如下字段(使应用可以访问http开头的网络请求)</p>
 
-<p><img src="https://github.com/dengfeng520/LTSDKDocument/blob/master/demo1.png?raw=true" alt="demo1"></p>
+<div><pre><code class="language-none">&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
+    &lt;dict&gt;
+        &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;
+        &lt;true/&gt;
+    &lt;/dict&gt;</code></pre></div>
 
-<p>(1)、客户端调用支付模块代码，由<code>SDK</code>向<code>LT</code>服务器发起一个订单请求；<br>
-(2)、拿到服务器给的订单<code>ID</code>后，<code>SDK</code>发起苹果支付；<br>
-(3)、苹果支付返回结果后，拿到支付<code>transaction</code>和<code>receipt_data</code>信息；<br>
-(4)、<code>SDK</code>把苹果返回的<code>receiptData</code>信息发给服务端，<code>LT</code>服务器向苹果服务器校验；<br>
-(5)、服务端对苹果服务器响应数据做处理和校验订单的合法性；<br>
-(6)、通过服务器验证的结果来确定支付的结果；<br></p>
+<p><br>
+补充说明:<br>
+1,URL Schemes 的添加方法</p>
 
-<p>(7)、支付成功回调
-支付成功回调的使用方法：
-需要CP服务器建立一个API供乐推服务调用
-回调地址所接受的参数格式</p>
+<p><img src="https://github.com/zhubinfeng/LTSDKDocument/blob/master/PicResource/URL_Schemes_config.png?raw=true" alt=""></p>
 
-<p><code>METHOD: POST</code></p>
+<p>2,配置-ObjC方法 <br>
+Build Setting -&gt; Other Linker Flags 添加-ObjC
+<img src="https://github.com/zhubinfeng/LTSDKDocument/blob/master/PicResource/-ObjC_config.png?raw=true" alt=""></p>
 
-<p><code>HEADER:Content-Type:application/json</code></p>
+<h2 id="toc_1">第二步，初始化LT应用</h2>
 
-<p><code>BODY:</code></p>
+<p>1，在APPdelegate.h文件中导入头文件</p>
 
-<table>
-<thead>
-<tr>
-<th style="text-align: center">参数</th>
-<th style="text-align: center">类型</th>
-<th style="text-align: center">说明</th>
-</tr>
-</thead>
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;</code></pre></div>
 
-<tbody>
-<tr>
-<td style="text-align: center"><code>lt_order_id</code></td>
-<td style="text-align: center">string</td>
-<td style="text-align: center">乐推订单号</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>pay_mode</code></td>
-<td style="text-align: center">int</td>
-<td style="text-align: center">支付方式</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>custom</code></td>
-<td style="text-align: center">array</td>
-<td style="text-align: center">dict</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>app_name</code></td>
-<td style="text-align: center">string</td>
-<td style="text-align: center">app名</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>package_name</code></td>
-<td style="text-align: center">string</td>
-<td style="text-align: center">包ID</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>lt_gid</code></td>
-<td style="text-align: center">int</td>
-<td style="text-align: center">乐推商品ID</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>price</code></td>
-<td style="text-align: center">double</td>
-<td style="text-align: center">金额</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>abb</code></td>
-<td style="text-align: center">string</td>
-<td style="text-align: center">币种缩写</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>time</code></td>
-<td style="text-align: center">int</td>
-<td style="text-align: center">支付时间戳</td>
-</tr>
-<tr>
-<td style="text-align: center"><code>token</code></td>
-<td style="text-align: center">string</td>
-<td style="text-align: center">加密验证token</td>
-</tr>
-</tbody>
-</table>
+<p>2,初始化应用(可以在AppDelegate.m文件的didFinishLaunchingWithOptions方法中调用)<br></p>
 
-<p>CP方为了安全起见需要对token进行验证
-token的加密方法为
-md5({BODY的第二个参数}{APP<em>SECRET</em>KEY}{支付时间戳})</p>
+<div><pre><code class="language-none">[self.loginManager registLTAppID:@&quot;此处填写从乐推平台申请的APPID&quot;
+                          appkey:@&quot;此处填写从乐推平台申请的APPKEY&quot;
+                UIViewController:self];</code></pre></div>
 
-<p>BODY参数除了custom和token其他参数均为乱序，和上表顺序不一样，所以每次需要针对BODY取第二个参数
-APP<em>SECRET</em>KEY在乐推平台创建应用时生成
-支付时间戳为BODY中的time。</p>
+<p>3,在AppDelegate.m文件添加应用回调<br></p>
 
-<blockquote>
-<h3 id="toc_1">2、支付SDK简介</h3>
-</blockquote>
+<div><pre><code class="language-none">-(BOOL)application:(UIApplication *)app
+           openURL:(NSURL *)url
+           options:(NSDictionary&lt;UIApplicationOpenURLOptionsKey,id&gt; *)options{
+    [[LTLoginManager sharedInstance] LTPlatformApplication:app openURL:url ptions:options];
+    return YES;
+}</code></pre></div>
 
-<p><code>SDK</code>支付模块目前给的有3个<code>.h</code>文件:<br>
-(1)、<code>LTPlayErrorCode</code>可以查看支付时的各种状态码或错误码；<br>
-(2)、<code>GoodsModel</code>传人参数的<code>Model</code>文件，可以查看有哪些参数是必传的，哪些是非必传的；<br>
-(3)、<code>LTPlayManager</code>支付主类，用于完成支付、支付验证、支付回调等操作；</p>
+<h2 id="toc_2">第三步，集成对应的第三平台</h2>
 
-<blockquote>
-<h3 id="toc_2">3、准备工作</h3>
-</blockquote>
+<p><strong>一 Facebook集成</strong></p>
 
-<h3 id="toc_3">1、软件和硬件条件:兼容<code>iOS 9</code>以及之后的所有版本的<code>iPhone</code>和<code>iPad</code>设备；</h3>
+<p>1,添加URL scheme（URL scheme的添加方法见上文补充说明）<br>
+&nbsp;&nbsp;&nbsp;值为fb123456789 (数字替换为从Facebook平台申请的APPID)</p>
 
-<h3 id="toc_4">2、请在工程中设置<code>info.plist</code>中设置<code>Allow Arbitrary Loads</code>为YES！<a href="https://stackoverflow.com/questions/31254725/transport-security-has-blocked-a-cleartext-http">设置方法请点这里</a></h3>
+<p>2,在info.plist中dict节点下添加</p>
 
-<h3 id="toc_5">3、接入支付前请先<a href="https://dengfeng520.github.io/LTSDKDocument/LTGameSDK%E7%99%BB%E5%BD%95%E6%96%87%E6%A1%A3.html">登录</a>！</h3>
+<div><pre><code class="language-none">     &lt;key&gt;FacebookAppID&lt;/key&gt;
+     &lt;string&gt;此处填写从Facebook申请的APPID&lt;/string&gt;
+     &lt;key&gt;FacebookDisplayName&lt;/key&gt;
+     &lt;string&gt;应用的名称&lt;/string&gt;
+     &lt;key&gt;LSApplicationQueriesSchemes&lt;/key&gt;
+     &lt;array&gt;
+     &lt;string&gt;fbapi&lt;/string&gt;
+     &lt;string&gt;fb-messenger-share-api&lt;/string&gt;
+     &lt;string&gt;fbauth2&lt;/string&gt;
+     &lt;string&gt;fbshareextension&lt;/string&gt;
+     &lt;/array&gt;</code></pre></div>
 
-<h3 id="toc_6">4、开启工程支付功能</h3>
+<p>3，配置-ObjC（配置方法见上文的补充说明）</p>
 
-<p><img src="https://github.com/dengfeng520/LTSDKDocument/blob/master/demo2.jpeg?raw=true" alt="demo2"></p>
+<p>4，在要使用登录功能的UIViewController中导入头文件</p>
 
-<h3 id="toc_7">5、其他更多细节请阅读<a href="https://help.apple.com/app-store-connect/#/devb57be10e7">Apple官方文档：App内购买项目配置</a></h3>
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
 
-<blockquote>
-<h3 id="toc_8">4、导入头文件</h3>
-</blockquote>
+<p>5，在需要调用的地方调用登录</p>
 
-<div><pre><code class="language-none">// 支付管理类
-#import &lt;LTGameSDK/LTPlayManager.h&gt;
-// Model类
-#import &lt;LTGameSDK/GoodsModel.h&gt;</code></pre></div>
+<div><pre><code class="language-none">[[LTLoginManager sharedInstance] signInWithType:LTPlatformFacebook fromViewController:self callback:^(LTUser *loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
 
-<blockquote>
-<h3 id="toc_9">5、初始化</h3>
-</blockquote>
+<p><strong>二 Google集成</strong></p>
 
-<div><pre><code class="language-none">@property (strong, nonatomic) LTPlayManager *playManager;
-</code></pre></div>
+<p>1,添加URL scheme（URL scheme的添加方法见上文补充说明）<br>
+&nbsp;&nbsp;&nbsp;值为com.googleusercontent.apps.123456789 (数字替换为从Google平台申请的ClinetID)</p>
 
-<h4 id="toc_10">使用自定义的初始化方法，通过Blocks回调</h4>
+<p>2，配置-ObjC（配置方法见上文的补充说明）</p>
 
-<div><pre><code class="language-none">    //==============================
-    GoodsModel *goodsModel = [[GoodsModel alloc]init];
-    goodsModel.gid = @&quot;1&quot;;
-    goodsModel.productId = @&quot;com.gnetop.339Golds&quot;;
-    goodsModel.custom = @{};
-    goodsModel.payType = LTPayTypeDevelop;
-   self.playManager = [[LTPlayManager alloc]initPlayWithViewModel:goodsModel SuccessBlocks:^(int code, NSDictionary * _Nonnull successInfoData, NSString * _Nonnull secuessInfoMessage) {
+<p>3，在要使用登录功能的UIViewController中导入头文件</p>
 
-    } failureBlocks:^(int error, NSString * _Nonnull errorInfoMessage) {
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
 
-    }];
-    self.playManager.nowStatusBlocks = ^(int code, NSString * _Nonnull nowInfoMessage) {
-        
-    };  </code></pre></div>
+<p>4，在要使用登录UIViewCcontroller中调用Google注册方法</p>
 
-<blockquote>
-<h3 id="toc_11">6、回调返回参数</h3>
-</blockquote>
+<div><pre><code class="language-none">
+[[LTLoginManager sharedInstance] setPlatform:LTPlatformGoogle
+                                          appKey:nil
+                                           appID:@&quot;123456789.apps.googleusercontent.com&quot;
+                                       appSecret:nil redirectURL:nil URLSchemes:nil];</code></pre></div>
 
-<p>不论支付成功还是失败都返回状态码和对应的信息，
-如支付成功后，返回的<code>code</code>为<code>1000</code>,同时返回了支付成功的键值对，举例：</p>
+<p>5，登录调用</p>
 
-<div><pre><code class="language-none">code,secuessInfoData,secuessInfoMessage===========1000,{
-    code = 200;
-    msg = success;
-    result = OK;
-},==============Transaction is in queue, user has been charged.  Client should complete the transaction.</code></pre></div>
+<div><pre><code class="language-none">[self.loginManager signInWithType:LTPlatformGoogle fromViewController:self callback:^(LTUser *loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
 
-<blockquote>
-<h3 id="toc_12">7、GoodsModel类</h3>
-</blockquote>
+<h2 id="toc_3">第四步，使用带UI的登录功能</h2>
 
-<p><code>GoodsModel</code>类中有四个参数，</p>
+<p>1，使用SDK的登录UI
+1&gt;在要使用UI登录功能的UIViewController中导入头文件</p>
 
-<div><pre><code class="language-none">// your APP Bundle Id
-@property (nonatomic, copy) NSString *package_id;
-//Must and cannot be null
-@property (nonatomic, copy, nonnull) NSString *gid;
-//商品ID 形如（com.test.1gold） Must and cannot be null
-@property (nonatomic, copy, nonnull) NSString *productId
-//预留的，数组或者字典Reserved, array or dictionary，Must and cannot be null
-@property (nonatomic, copy, nonnull) id custom</code></pre></div>
+<div><pre><code class="language-none">#import &lt;LTGameSDKUIYXLHW/LTUIManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
 
-<blockquote>
-<h3 id="toc_13">8、错误码</h3>
-</blockquote>
+<p>2&gt;设置用户协议和隐私条款连接地址</p>
 
-<p>在<code>LTPlayErrorCode</code>类中返回了各种情况状态码：可根据返回的不同状态码来判断是哪里出错了。</p>
+<div><pre><code class="language-none">[[LTUIManager sharedInstance] linkOfUserAgreement:@&quot;https://github.com/&quot;
+                                   andPrivacyLine:@&quot;https://www.baidu.com/&quot;];</code></pre></div>
 
-<div><pre><code class="language-none">    /// 购买成功
-    TypePlaySuccess = 1000,
-    /// 请求订单时失败
-    TypeGetOrderFailure = 1001,
-    /// 没有商品 Product list is null
-    TypeProductListIsNull = 10002,
-    /// 商品ID和苹果给的不匹配Product ID and apple server do not match
-    TypeProductIDNotMatch = 1003,
-    /// 正在购买 buying
-    TypePlayingfromAppleServer = 1004,
-    /// 已经收到Apple的购买成功通知 正在和服务器验证
-    TypeMineServerVerifying = 1005,
-    /// 购买失败
-    TypePlayFailureCode = 1006,
-    /// 已经购买， Apple正在处理
-    TypePlaymentTransactionStateRestored = 1007,
-    /// 正在购买中，最终状态还没确定
-    TypePlaymentTransactionStateDeferred = 1008,
-    /// 服务器验证支付失败
-    TypeServerPlaymentVerificationFailed = 1009,
-</code></pre></div>
+<p>3&gt;调用UI界面进行显示</p>
 
-<blockquote>
-<h3 id="toc_14">9、test or release</h3>
-</blockquote>
+<div><pre><code class="language-none">[[LTUIManager sharedInstance] showLoginUI:self withBlock:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
 
-<div><pre><code class="language-none">typedef NS_ENUM(NSInteger,LTPayType)
-{
-    LTPayTypeDistribute = 0,
-    LTPayTypeDevelop,
-};</code></pre></div>
+<p>2,如何退出登录</p>
 
-<p>在初始化<code>SDK</code>时需要传入当前环境标记，如果是测试环境,</p>
+<p>1&gt;清除数据并弹出SDK登录界面</p>
 
-<div><pre><code class="language-none">goodsModel.payType = LTPayTypeDevelop;</code></pre></div>
+<div><pre><code class="language-none">[[LTUIManager sharedInstance] userLogoutWithUI:self withBlock:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
 
-<p>如果是正式环境：</p>
+<p>2&gt;只清除数据，不弹出SDK登录界面</p>
 
-<div><pre><code class="language-none">goodsModel.payType = LTPayTypeDistribute;</code></pre></div>
+<div><pre><code class="language-none">[[LTSDKLoginManager sharedInstance] userLogout];</code></pre></div>
+
+<p>3,获取用户信息</p>
+
+<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] getUserLoginState:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
 
 
 
