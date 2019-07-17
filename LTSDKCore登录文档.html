@@ -5,7 +5,7 @@
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>LTGameSDK登录文档Core版</title>
+<title>LTSDKCore登录文档</title>
 
 
 <style type="text/css">
@@ -343,7 +343,8 @@ pod &#39;LTGameSDKCore&#39;</code></pre></div>
 <p>2按需导入对应的第三方库</p>
 
 <div><pre><code class="language-none">pod &#39;LTGameSDKCore/LTSDKPlatforms/Facebook&#39;
-pod &#39;LTGameSDKCore/LTSDKPlatforms/Google&#39;</code></pre></div>
+pod &#39;LTGameSDKCore/LTSDKPlatforms/Google&#39;
+pod &#39;LTGameSDKCore/LTSDKPlatforms/Phone&#39;</code></pre></div>
 
 <p>3按需导入对应的UI库（具体地址请在线沟通）</p>
 
@@ -514,17 +515,70 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
 
 <p>3,获取用户信息</p>
 
-<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] getUserLoginState:^(LTUser * _Nonnull loginUser) {
+<div><pre><code class="language-none">    LTUser *current = [[LTLoginManager sharedInstance] getUserInfo];
+    if (current.stateCode == LTLoginSuccess) {
+        NSString *lt_UID = current.LT_UID;
+        NSString *LTUidToken = current.LTUidToken;
+        NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+    }</code></pre></div>
+
+<h2 id="toc_4">第五步，手机登录相关</h2>
+
+<p>在要使用手机登录相关功能的.m文件中导入头文件</p>
+
+<div><pre><code class="language-none">#import &lt;LTPlatformPhone/LTPhoneManager.h&gt;</code></pre></div>
+
+<p>1,发送验证码<br></p>
+
+<div><pre><code class="language-none">    //获取输入的手机号
+    NSString *phoneNumber = self.phoneInput.text;
+    [[LTPhoneManager sharedInstance] sendPhoneCode:^(NSDictionary * _Nonnull resultInfo) {
+        NSString *authCode = resultInfo[@&quot;data&quot;][@&quot;auth_code&quot;];
+        NSString *msg = resultInfo[@&quot;msg&quot;];
+    } phoneNumber:phoneNumber];</code></pre></div>
+
+<p>2,手机号注册<br></p>
+
+<div><pre><code class="language-none">    //获取输入的手机号
+    NSString *phoneNumber = self.phoneInput.text;
+    //获取输入验证码
+    NSString *authCode = self.authCodeInput.text;
+    //获取输入密码
+    NSString *passsword = self.passwordInput.text;
+    [[LTPhoneManager sharedInstance] phoneRegist:^(LTUser * _Nonnull loginUser) {
         if (loginUser.stateCode == LTLoginSuccess) {
             NSString *lt_UID = loginUser.LT_UID;
             NSString *LTUidToken = loginUser.LTUidToken;
             NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
-        }else if (loginUser.stateCode == LTLoginCancel){
-            NSLog(@&quot;用户取消了登录&quot;);
-        }else if (loginUser.stateCode == LTLoginFailed){
-            NSLog(@&quot;登录失败&quot;);
         }
-    }];</code></pre></div>
+    } withPhoneNumber:phoneNumber withAuthCode:authCode withPassword:passsword];</code></pre></div>
+
+<p>3,手机号登录<br></p>
+
+<div><pre><code class="language-none">    //获取输入的手机号
+    NSString *phoneNumber = self.phoneInput.text;
+    //获取输入的密码
+    NSString *passsword = self.passwordInput.text;
+    [[LTPhoneManager sharedInstance] phoneLogin:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }
+    } withPhoneNumber:phoneNumber withPassword:passsword];</code></pre></div>
+
+<p>4,重置密码<br></p>
+
+<div><pre><code class="language-none">
+    //获取输入的手机号
+    NSString *phoneNumber = self.phoneInput.text;
+    //获取输入的验证码
+    NSString *authCode = self.authCodeInput.text;
+    //获取输入的密码
+    NSString *passsword = self.passwordInput.text;
+    [[LTPhoneManager sharedInstance] resetPassword:^(NSDictionary * _Nonnull resultInfo) {
+        NSString *msg = resultInfo[@&quot;msg&quot;];
+    } withPhoneNumber:phoneNumber withAuthCode:authCode withPassword:passsword];</code></pre></div>
 
 
 
