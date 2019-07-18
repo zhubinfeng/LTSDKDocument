@@ -466,6 +466,105 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
         }
     }];</code></pre></div>
 
+<p><strong>三 QQ集成</strong></p>
+
+<p>1,添加URL scheme（URL scheme的添加方法见上文补充说明）<br>
+&nbsp;&nbsp;&nbsp;值为tencent123456789 (数字替换为从QQ平台申请的AppID)</p>
+
+<p>2,在info.plist中添加如下字段</p>
+
+<div><pre><code class="language-none">     &lt;key&gt;LSApplicationQueriesSchemes&lt;/key&gt;
+     &lt;string&gt;mqqapi&lt;/string&gt;
+     &lt;string&gt;mqq&lt;/string&gt;
+     &lt;string&gt;mqqOpensdkSSoLogin&lt;/string&gt;
+     &lt;string&gt;mqqconnect&lt;/string&gt;
+     &lt;string&gt;mqqopensdkdataline&lt;/string&gt;
+     &lt;string&gt;mqqopensdkgrouptribeshare&lt;/string&gt;
+     &lt;string&gt;mqqopensdkfriend&lt;/string&gt;
+     &lt;string&gt;mqqopensdkapi&lt;/string&gt;
+     &lt;string&gt;mqqopensdkapiV2&lt;/string&gt;
+     &lt;string&gt;mqqopensdkapiV3&lt;/string&gt;
+     &lt;string&gt;mqzoneopensdk&lt;/string&gt;
+     &lt;string&gt;mqqopensdkapiV3&lt;/string&gt;
+     &lt;string&gt;mqqopensdkapiV3&lt;/string&gt;
+     &lt;string&gt;mqzone&lt;/string&gt;
+     &lt;string&gt;mqzonev2&lt;/string&gt;
+     &lt;string&gt;mqzoneshare&lt;/string&gt;
+     &lt;string&gt;wtloginqzone&lt;/string&gt;
+     &lt;string&gt;mqzonewx&lt;/string&gt;
+     &lt;string&gt;mqzoneopensdkapiV2&lt;/string&gt;
+     &lt;string&gt;mqzoneopensdkapi19&lt;/string&gt;
+     &lt;string&gt;mqzoneopensdkapi&lt;/string&gt;
+     &lt;string&gt;mqzoneopensdk&lt;/string&gt;</code></pre></div>
+
+<p>3，在要使用登录功能的UIViewController中导入头文件</p>
+
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
+
+<p>4，在要使用登录UIViewCcontroller中调用QQ注册方法</p>
+
+<div><pre><code class="language-none">
+    [self.loginManager setPlatform:LTPlatformQQ
+                            appKey:nil
+                             appID:@&quot;123456789&quot;
+                         appSecret:nil
+                       redirectURL:nil
+                        URLSchemes:nil];</code></pre></div>
+
+<p>5，登录调用</p>
+
+<div><pre><code class="language-none">[self.loginManager signInWithType:LTPlatformQQ fromViewController:self callback:^(LTUser *loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
+
+<p><strong>四 微信集成</strong></p>
+
+<p>1,添加URL scheme（URL scheme的添加方法见上文补充说明）<br>
+&nbsp;&nbsp;&nbsp;值为12345678 (数字替换为从微信平台申请的AppID)</p>
+
+<p>2,在info.plist中添加如下字段</p>
+
+<div><pre><code class="language-none">     &lt;key&gt;LSApplicationQueriesSchemes&lt;/key&gt;
+     &lt;string&gt;weixin&lt;/string&gt;</code></pre></div>
+
+<p>3，在要使用登录功能的UIViewController中导入头文件</p>
+
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
+
+<p>4，在要使用登录UIViewCcontroller中调用微信注册方法</p>
+
+<div><pre><code class="language-none">
+    [self.loginManager setPlatform:LTPlatformWeixin
+                            appKey:nil
+                             appID:@&quot;123456789&quot;
+                         appSecret:nil
+                       redirectURL:nil
+                        URLSchemes:nil];</code></pre></div>
+
+<p>5，登录调用</p>
+
+<div><pre><code class="language-none">[self.loginManager signInWithType:LTPlatformWeixin fromViewController:self callback:^(LTUser *loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
+
 <h2 id="toc_3">第四步，使用带UI的登录功能</h2>
 
 <p>1，使用SDK的登录UI
