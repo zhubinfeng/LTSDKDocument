@@ -332,13 +332,14 @@ kbd {
 
 <h2 id="toc_0">第一步,添加库</h2>
 
-<p>1，cocopods安装三方库 </p>
+<p>1，cocopods安装三方库 <br></p>
 
 <blockquote>
-<p>1集成核心库（必须），在podfile文件中添加如下代码</p>
+<p>1集成核心库（必须），在podfile文件中添加如下代码（如果没有podfile文件，则使用命令行工具进入到项目根目录执行 pod init ）</p>
 
 <div><pre><code class="language-none">use_frameworks!
-pod &#39;LTGameSDKCore&#39;</code></pre></div>
+pod &#39;LTGameSDKCore&#39;
+pod &#39;AFNetworking&#39;</code></pre></div>
 
 <p>2按需导入对应的第三方库</p>
 
@@ -377,11 +378,12 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
 
 <div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;</code></pre></div>
 
-<p>2,初始化应用(可以在AppDelegate.m文件的didFinishLaunchingWithOptions方法中调用)<br></p>
+<p>2,初始化应用(可以在AppDelegate.m文件的didFinishLaunchingWithOptions方法中调用)<br>
+<font color="#ff0000"><em>上线前请确认使用正式服务器接口地址</em></font><br /> <br></p>
 
-<div><pre><code class="language-none">[self.loginManager registLTAppID:@&quot;此处填写从乐推平台申请的APPID&quot;
-                          appkey:@&quot;此处填写从乐推平台申请的APPKEY&quot;
-                UIViewController:self];</code></pre></div>
+<div><pre><code class="language-none">    [self.loginManager registLTAppID:@&quot;20000&quot;
+                              appkey:@&quot;U$1t3XV@ZDwyygLA11#j8*INJ6jGDD^E&quot;
+                           serverURL:@&quot;http://sdk.aktgo.com&quot;];</code></pre></div>
 
 <p>3,在AppDelegate.m文件添加应用回调<br></p>
 
