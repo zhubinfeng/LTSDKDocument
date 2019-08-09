@@ -330,7 +330,31 @@ kbd {
 
 <p><center><H1>LTSDK登录模块文档</h1></center><br></p>
 
-<p><font color="#ff0000">注意：<em>SDK中用到了IDFA，在提审时需要勾选使用了此功能</em></font></p>
+<p><font color="#ff0000">注意：<em>SDK中用到了IDFA，在提审时需要勾选使用了此功能</em></font><br><br>
+更新说明:</p>
+
+<table>
+<thead>
+<tr>
+<th>文档版本号</th>
+<th>需求</th>
+<th>修改内容</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1.0.1</td>
+<td>UI库游客按钮的显示与隐藏控制</td>
+<td>showLoginUI接口添加showTourist参数</td>
+</tr>
+<tr>
+<td>1.0.2</td>
+<td>文档优化</td>
+<td>添加getUserStateWithServerCheck接口使用说明</td>
+</tr>
+</tbody>
+</table>
 
 <h2 id="toc_0">第一步,添加库</h2>
 
@@ -397,6 +421,18 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
 }</code></pre></div>
 
 <h2 id="toc_2">第三步，集成对应的第三平台</h2>
+
+<p><em>登录状态检测</em></p>
+
+<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] getUserStateWithServerCheck:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        } else {
+            NSLog(@&quot;User not login.&quot;);
+        }
+    }];</code></pre></div>
 
 <p><strong>一 Facebook集成</strong></p>
 
