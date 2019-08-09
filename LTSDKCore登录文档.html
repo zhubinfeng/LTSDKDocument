@@ -573,7 +573,7 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
 
 <h2 id="toc_3">第四步，使用带UI的登录功能</h2>
 
-<p>1，使用SDK的登录UI
+<p>一，使用SDK的登录UI<br>
 1&gt;在要使用UI登录功能的UIViewController中导入头文件</p>
 
 <div><pre><code class="language-none">#import &lt;LTGameSDKUIYXLHW/LTUIManager.h&gt;
@@ -584,7 +584,8 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
 <div><pre><code class="language-none">[[LTUIManager sharedInstance] linkOfUserAgreement:@&quot;https://github.com/&quot;
                                    andPrivacyLine:@&quot;https://www.baidu.com/&quot;];</code></pre></div>
 
-<p>3&gt;调用UI界面进行显示</p>
+<p>3&gt;调用UI界面进行显示<br>
+&nbsp;&nbsp;&nbsp;&nbsp;1,显示游客登录按钮</p>
 
 <div><pre><code class="language-none">[[LTUIManager sharedInstance] showLoginUI:self withBlock:^(LTUser * _Nonnull loginUser) {
         if (loginUser.stateCode == LTLoginSuccess) {
@@ -596,9 +597,23 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
         }else if (loginUser.stateCode == LTLoginFailed){
             NSLog(@&quot;登录失败&quot;);
         }
-    }];</code></pre></div>
+    }  showTourist:YES];</code></pre></div>
 
-<p>2,如何退出登录</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;2,不显示游客登录按钮</p>
+
+<div><pre><code class="language-none">[[LTUIManager sharedInstance] showLoginUI:self withBlock:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    } showTourist:NO];</code></pre></div>
+
+<p>二,如何退出登录</p>
 
 <p>1&gt;清除数据并弹出SDK登录界面</p>
 
