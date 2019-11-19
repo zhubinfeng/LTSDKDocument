@@ -536,16 +536,16 @@ div.prism-show-language > div.prism-show-language-label {
 <p>1集成核心库（必须），在podfile文件中添加如下代码（如果没有podfile文件，则使用命令行工具进入到项目根目录执行 pod init ）</p>
 
 <div><pre><code class="language-none">use_frameworks!
-pod &#39;LTGameSDKCore&#39;
+pod &#39;LTGameSDKCore&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;
 pod &#39;AFNetworking&#39;</code></pre></div>
 
 <p>2按需导入对应的第三方库</p>
 
-<div><pre><code class="language-none">pod &#39;LTGameSDKCore/LTSDKPlatforms/Facebook&#39;
-pod &#39;LTGameSDKCore/LTSDKPlatforms/Google&#39;
-pod &#39;LTGameSDKCore/LTSDKPlatforms/Phone&#39;
-pod &#39;LTGameSDKCore/LTSDKPlatforms/QQ&#39;
-pod &#39;LTGameSDKCore/LTSDKPlatforms/Weixin&#39;</code></pre></div>
+<div><pre><code class="language-none">pod &#39;LTGameSDKCore/LTSDKPlatforms/Facebook&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;
+pod &#39;LTGameSDKCore/LTSDKPlatforms/Google&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;
+pod &#39;LTGameSDKCore/LTSDKPlatforms/Phone&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;
+pod &#39;LTGameSDKCore/LTSDKPlatforms/QQ&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;
+pod &#39;LTGameSDKCore/LTSDKPlatforms/Weixin&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;</code></pre></div>
 
 <p>3按需导入对应的UI库（具体地址请在线沟通）</p>
 
