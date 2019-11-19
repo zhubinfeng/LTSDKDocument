@@ -716,20 +716,7 @@ APP<em>SECRET</em>KEY在乐推平台创建应用时生成，支付时间戳为BO
         }]; </code></pre></div>
 
 <blockquote>
-<h3 id="toc_11">6、回调返回参数</h3>
-</blockquote>
-
-<p>不论支付成功还是失败都返回状态码和对应的信息，
-如支付成功后，返回的<code>code</code>为<code>1000</code>,同时返回了支付成功的键值对，举例：</p>
-
-<div><pre><code class="language-none">code,secuessInfoData,secuessInfoMessage===========1000,{
-    code = 200;
-    msg = success;
-    result = OK;
-},==============Transaction is in queue, user has been charged.  Client should complete the transaction.</code></pre></div>
-
-<blockquote>
-<h3 id="toc_12">7、GoodsModel类</h3>
+<h3 id="toc_11">6、GoodsModel类</h3>
 </blockquote>
 
 <p><code>GoodsModel</code>类中有四个参数，</p>
@@ -744,7 +731,7 @@ APP<em>SECRET</em>KEY在乐推平台创建应用时生成，支付时间戳为BO
 @property (nonatomic, copy, nonnull) id custom</code></pre></div>
 
 <blockquote>
-<h3 id="toc_13">8、错误码</h3>
+<h3 id="toc_12">7、错误码</h3>
 </blockquote>
 
 <p>在<code>LTPlayErrorCode</code>类中返回了各种情况状态码：可根据返回的不同状态码来判断是哪里出错了。</p>
@@ -772,7 +759,7 @@ APP<em>SECRET</em>KEY在乐推平台创建应用时生成，支付时间戳为BO
 </code></pre></div>
 
 <blockquote>
-<h3 id="toc_14">9、test or release</h3>
+<h3 id="toc_13">8、test or release</h3>
 </blockquote>
 
 <div><pre><code class="language-none">typedef NS_ENUM(NSInteger,LTPayType)
