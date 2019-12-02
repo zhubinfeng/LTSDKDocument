@@ -502,7 +502,7 @@ div.prism-show-language > div.prism-show-language-label {
 
 <p><center><H1>LTSDK登录模块文档</h1></center><br></p>
 
-<p><font color="#ff0000">注意：<em>SDK中用到了IDFA，在提审时需要勾选使用了此功能</em></font><br><br>
+<p><font color="#ff0000">注意：<em>SDK中用到了IDFA，在提审时需要勾选使用了此功能</em><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>SDK中使用到了NSUserDefault存储，请在开发中不要清空此对象中的数据，避免发生问题</em></font><br><br>
 更新说明:</p>
 
 <table>
@@ -525,6 +525,11 @@ div.prism-show-language > div.prism-show-language-label {
 <td>文档优化</td>
 <td>添加getUserStateWithServerCheck接口使用说明</td>
 </tr>
+<tr>
+<td>1.0.3</td>
+<td>新增Sign in with Apple登录</td>
+<td>使用LTPlatformApple标识Apple登录类型</td>
+</tr>
 </tbody>
 </table>
 
@@ -533,11 +538,13 @@ div.prism-show-language > div.prism-show-language-label {
 <p>1，cocopods安装三方库 <br></p>
 
 <blockquote>
-<p>1集成核心库（必须），在podfile文件中添加如下代码（如果没有podfile文件，则使用命令行工具进入到项目根目录执行 pod init ）</p>
+<p>1集成下列必要库文件，在podfile文件中添加如下代码（如果没有podfile文件，则使用命令行工具进入到项目根目录执行 pod init ）</p>
 
 <div><pre><code class="language-none">use_frameworks!
 pod &#39;LTGameSDKCore&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;
-pod &#39;AFNetworking&#39;, &#39;~&gt; 3.2.1&#39;, :subspecs =&gt; [&#39;Reachability&#39;, &#39;Serialization&#39;, &#39;Security&#39;, &#39;NSURLSession&#39;]</code></pre></div>
+pod &#39;AFNetworking&#39;, &#39;~&gt; 3.2.1&#39;, :subspecs =&gt; [&#39;Reachability&#39;, &#39;Serialization&#39;, &#39;Security&#39;, &#39;NSURLSession&#39;]
+pod &#39;LTGameSDKCore/LTSDKPlatforms/Guest&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;
+pod &#39;LTGameSDKCore/LTSDKPlatforms/AppleSign&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;</code></pre></div>
 
 <p>2按需导入对应的第三方库</p>
 
@@ -548,9 +555,10 @@ pod &#39;LTGameSDKCore/LTSDKPlatforms/QQ&#39;, :git =&gt; &#39;https://github.co
 pod &#39;LTGameSDKCore/LTSDKPlatforms/Weixin&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/LTGameSDKCore&#39;</code></pre></div>
 
 <p>3按需导入对应的UI库（具体地址请在线沟通）</p>
-
-<div><pre><code class="language-none">pod &#39;SDKUIXXX&#39;</code></pre></div>
 </blockquote>
+
+<div><pre><code class="language-none">pod &#39;SDKUISHYU&#39;, :git =&gt; &#39;https://github.com/zhubinfeng/SDKUISHYU&#39;
+</code></pre></div>
 
 <p>2，info.plist添加如下字段(使应用可以访问http开头的网络请求)</p>
 
@@ -562,11 +570,11 @@ pod &#39;LTGameSDKCore/LTSDKPlatforms/Weixin&#39;, :git =&gt; &#39;https://githu
 
 <p><br>
 补充说明:<br>
-1,URL Schemes 的添加方法</p>
+1,添加URL Schemes,集成某个第三方的登录就需要添加对应的值&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Facebook值为fbxxxxxxxxx，Google值为com.googleusercontent.apps.xxxxxxxxx，微信值为xxxxxxxxx，QQ的值为tencentxxxxxxxxx。（xxxxxxxxx为从对应平台申请到的应用ID）</p>
 
 <p><img src="https://github.com/zhubinfeng/LTSDKDocument/blob/master/PicResource/URL_Schemes_config.png?raw=true" alt=""></p>
 
-<p>2,配置-ObjC方法 <br>
+<p>2,配置-ObjC<br>
 Build Setting -&gt; Other Linker Flags 添加-ObjC
 <img src="https://github.com/zhubinfeng/LTSDKDocument/blob/master/PicResource/-ObjC_config.png?raw=true" alt=""></p>
 
@@ -576,7 +584,16 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
 
 <div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;</code></pre></div>
 
-<p>2,在AppDelegate.m文件添加应用回调<br></p>
+<p>2,在AppDelegate.m文件添加属性变量<br></p>
+
+<div><pre><code class="language-none">@property (strong, nonatomic) LTLoginManager *loginManager;</code></pre></div>
+
+<p>3,初始化应用,在AppDelegate.m的didFinishLaunchingWithOptions方法中添加如下代码<br>
+<font color="#ff0000"><em>上线前请确认isDevelopmentModel的参数值为&nbsp;NO</em></font><br /> <br></p>
+
+<div><pre><code class="language-none">[self.loginManager registLTAppID:@&quot;从乐推平台申请的应用ID&quot; appkey:@&quot;从乐推平台申请的应用AppKey&quot; isDevelopmentModel:YES];</code></pre></div>
+
+<p>4,在AppDelegate.m文件添加应用回调<br></p>
 
 <div><pre><code class="language-none">-(BOOL)application:(UIApplication *)app
            openURL:(NSURL *)url
@@ -585,33 +602,11 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
     return YES;
 }</code></pre></div>
 
-<p>3,初始化应用,在AppDelegate.m的didFinishLaunchingWithOptions方法中添加如下代码<br>
-<font color="#ff0000"><em>上线前请确认使用正式服务器接口地址</em></font><br /> <br></p>
+<h2 id="toc_2">第三步，使用带UI的登录功能</h2>
 
-<div><pre><code class="language-none"> [self.loginManager registLTAppID:@&quot;从乐推平台申请的应用ID&quot;
-                              appkey:@&quot;从乐推平台申请的应用AppKey&quot;
-                           serverURL:@&quot;服务器地址&quot;];</code></pre></div>
-
-<h2 id="toc_2">第三步，集成对应的第三平台</h2>
-
-<p><em>登录状态检测</em></p>
-
-<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] getUserStateWithServerCheck:^(LTUser * _Nonnull loginUser) {
-        if (loginUser.stateCode == LTLoginSuccess) {
-            NSString *lt_UID = loginUser.LT_UID;
-            NSString *LTUidToken = loginUser.LTUidToken;
-            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
-        } else {
-            NSLog(@&quot;User not login.&quot;);
-        }
-    }];</code></pre></div>
-
-<p><strong>一 Facebook集成</strong></p>
-
-<p>1,添加URL scheme（URL scheme的添加方法见上文补充说明）<br>
-&nbsp;&nbsp;&nbsp;值为fb123456789 (数字替换为从Facebook平台申请的APPID)</p>
-
-<p>2,在info.plist中dict节点下添加</p>
+<p><em>使用带UI登录时的必要工作</em><br>
+1,Facebook<br>
+在info.plist中dict节点下添加</p>
 
 <div><pre><code class="language-none">     &lt;key&gt;FacebookAppID&lt;/key&gt;
      &lt;string&gt;此处填写从Facebook申请的APPID&lt;/string&gt;
@@ -625,14 +620,153 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
      &lt;string&gt;fbshareextension&lt;/string&gt;
      &lt;/array&gt;</code></pre></div>
 
-<p>3，配置-ObjC（配置方法见上文的补充说明）</p>
+<p>2,Google<br>
+在要使用登录UIViewCcontroller中调用Google注册方法</p>
 
-<p>4，在要使用登录功能的UIViewController中导入头文件</p>
+<div><pre><code class="language-none">
+[[LTLoginManager sharedInstance] setPlatform:LTPlatformGoogle
+                                          appKey:nil
+                                           appID:@&quot;xxxxxxxx.apps.googleusercontent.com&quot;
+                                       appSecret:nil redirectURL:nil URLSchemes:nil];</code></pre></div>
+
+<h3 id="toc_3">一，开始使用带UI的SDK登录功能<br></h3>
+
+<p>1&gt;在要使用UI登录功能的UIViewController中导入头文件</p>
+
+<div><pre><code class="language-none">#import &lt;SDKUISHYU/LTUIManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
+
+<p>2&gt;设置用户协议和隐私条款连接地址（此处为演示地址，上线前请修改）</p>
+
+<div><pre><code class="language-none">[[LTUIManager sharedInstance] linkOfUserAgreement:@&quot;https://github.com/&quot;
+                                   andPrivacyLine:@&quot;https://www.baidu.com/&quot;];</code></pre></div>
+
+<p>3&gt;调用UI界面进行显示<br></p>
+
+<div><pre><code class="language-none">    [[LTUIManager sharedInstance] showLoginUI:self withBlock:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+        [self checkUserInfo:loginUser];
+    }];</code></pre></div>
+
+<h3 id="toc_4">二,附属操作</h3>
+
+<p>1&gt;带有登录界面的退出登录操作</p>
+
+<div><pre><code class="language-none">[[LTUIManager sharedInstance] userLogoutWithUI:self withBlock:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
+
+<p>2&gt;无登录界面的退出登录操作</p>
+
+<div><pre><code class="language-none">[[LTSDKLoginManager sharedInstance] userLogout];</code></pre></div>
+
+<p>3,获取用户信息</p>
+
+<div><pre><code class="language-none">    LTUser *current = [[LTLoginManager sharedInstance] getUserInfo];
+    if (current.stateCode == LTLoginSuccess) {
+        NSString *lt_UID = current.LT_UID;
+        NSString *LTUidToken = current.LTUidToken;
+        NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+    }</code></pre></div>
+
+<p>4,自动登录调用（根据缓存的第三方数据请求服务器）</p>
+
+<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] getUserStateWithServerCheck:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        } else {
+            NSLog(@&quot;User not login.&quot;);
+        }
+    }];</code></pre></div>
+
+<h2 id="toc_5">第四步，集成对应的第三平台（不使用SDK的UI）</h2>
+
+<p><strong>一 Sign in with Apple集成</strong></p>
+
+<p>1，在要使用登录功能的UIViewController中导入头文件</p>
 
 <div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
 #import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
 
-<p>5，在需要调用的地方调用登录</p>
+<p>2，登录调用</p>
+
+<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] signInWithType:LTPlatformApple
+                                 fromViewController:self
+                                           callback:^(LTUser *loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
+
+<p><strong>游客 登录集成</strong></p>
+
+<p>1，在要使用登录功能的UIViewController中导入头文件</p>
+
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
+
+<p>2，登录调用</p>
+
+<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] signInWithType:LTPlatformGuest
+                                 fromViewController:self
+                                           callback:^(LTUser *loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
+
+<p><strong>三 Facebook集成</strong></p>
+
+<p>1,在info.plist中dict节点下添加</p>
+
+<div><pre><code class="language-none">     &lt;key&gt;FacebookAppID&lt;/key&gt;
+     &lt;string&gt;此处填写从Facebook申请的APPID&lt;/string&gt;
+     &lt;key&gt;FacebookDisplayName&lt;/key&gt;
+     &lt;string&gt;应用的名称&lt;/string&gt;
+     &lt;key&gt;LSApplicationQueriesSchemes&lt;/key&gt;
+     &lt;array&gt;
+     &lt;string&gt;fbapi&lt;/string&gt;
+     &lt;string&gt;fb-messenger-share-api&lt;/string&gt;
+     &lt;string&gt;fbauth2&lt;/string&gt;
+     &lt;string&gt;fbshareextension&lt;/string&gt;
+     &lt;/array&gt;</code></pre></div>
+
+<p>2，在要使用登录功能的UIViewController中导入头文件</p>
+
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
+
+<p>3，在需要调用的地方调用登录</p>
 
 <div><pre><code class="language-none">[[LTLoginManager sharedInstance] signInWithType:LTPlatformFacebook fromViewController:self callback:^(LTUser *loginUser) {
         if (loginUser.stateCode == LTLoginSuccess) {
@@ -646,19 +780,14 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
         }
     }];</code></pre></div>
 
-<p><strong>二 Google集成</strong></p>
+<p><strong>四 Google集成</strong></p>
 
-<p>1,添加URL scheme（URL scheme的添加方法见上文补充说明）<br>
-&nbsp;&nbsp;&nbsp;值为com.googleusercontent.apps.123456789 (数字替换为从Google平台申请的ClinetID)</p>
-
-<p>2，配置-ObjC（配置方法见上文的补充说明）</p>
-
-<p>3，在要使用登录功能的UIViewController中导入头文件</p>
+<p>1，在要使用登录功能的UIViewController中导入头文件</p>
 
 <div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
 #import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
 
-<p>4，在要使用登录UIViewCcontroller中调用Google注册方法</p>
+<p>2，在要使用登录UIViewCcontroller中调用Google注册方法</p>
 
 <div><pre><code class="language-none">
 [[LTLoginManager sharedInstance] setPlatform:LTPlatformGoogle
@@ -666,7 +795,7 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
                                            appID:@&quot;123456789.apps.googleusercontent.com&quot;
                                        appSecret:nil redirectURL:nil URLSchemes:nil];</code></pre></div>
 
-<p>5，登录调用</p>
+<p>3，登录调用</p>
 
 <div><pre><code class="language-none">[self.loginManager signInWithType:LTPlatformGoogle fromViewController:self callback:^(LTUser *loginUser) {
         if (loginUser.stateCode == LTLoginSuccess) {
@@ -680,12 +809,9 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
         }
     }];</code></pre></div>
 
-<p><strong>三 QQ集成</strong></p>
+<p><strong>五 QQ集成</strong></p>
 
-<p>1,添加URL scheme（URL scheme的添加方法见上文补充说明）<br>
-&nbsp;&nbsp;&nbsp;值为tencent123456789 (数字替换为从QQ平台申请的AppID)</p>
-
-<p>2,在info.plist中添加如下字段</p>
+<p>1,在info.plist中添加如下字段</p>
 
 <div><pre><code class="language-none">     &lt;key&gt;LSApplicationQueriesSchemes&lt;/key&gt;
      &lt;string&gt;mqqapi&lt;/string&gt;
@@ -711,12 +837,12 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
      &lt;string&gt;mqzoneopensdkapi&lt;/string&gt;
      &lt;string&gt;mqzoneopensdk&lt;/string&gt;</code></pre></div>
 
-<p>3，在要使用登录功能的UIViewController中导入头文件</p>
+<p>2，在要使用登录功能的UIViewController中导入头文件</p>
 
 <div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
 #import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
 
-<p>4，在要使用登录UIViewCcontroller中调用QQ注册方法</p>
+<p>3，在要使用登录UIViewCcontroller中调用QQ注册方法</p>
 
 <div><pre><code class="language-none">
     [self.loginManager setPlatform:LTPlatformQQ
@@ -726,7 +852,7 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
                        redirectURL:nil
                         URLSchemes:nil];</code></pre></div>
 
-<p>5，登录调用</p>
+<p>4，登录调用</p>
 
 <div><pre><code class="language-none">[self.loginManager signInWithType:LTPlatformQQ fromViewController:self callback:^(LTUser *loginUser) {
         if (loginUser.stateCode == LTLoginSuccess) {
@@ -740,22 +866,19 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
         }
     }];</code></pre></div>
 
-<p><strong>四 微信集成</strong></p>
+<p><strong>六 微信集成</strong></p>
 
-<p>1,添加URL scheme（URL scheme的添加方法见上文补充说明）<br>
-&nbsp;&nbsp;&nbsp;值为12345678 (数字替换为从微信平台申请的AppID)</p>
-
-<p>2,在info.plist中添加如下字段</p>
+<p>1,在info.plist中添加如下字段</p>
 
 <div><pre><code class="language-none">     &lt;key&gt;LSApplicationQueriesSchemes&lt;/key&gt;
      &lt;string&gt;weixin&lt;/string&gt;</code></pre></div>
 
-<p>3，在要使用登录功能的UIViewController中导入头文件</p>
+<p>2，在要使用登录功能的UIViewController中导入头文件</p>
 
 <div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
 #import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
 
-<p>4，在要使用登录UIViewCcontroller中调用微信注册方法</p>
+<p>3，在要使用登录UIViewCcontroller中调用微信注册方法</p>
 
 <div><pre><code class="language-none">
     [self.loginManager setPlatform:LTPlatformWeixin
@@ -765,7 +888,7 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
                        redirectURL:nil
                         URLSchemes:nil];</code></pre></div>
 
-<p>5，登录调用</p>
+<p>4，登录调用</p>
 
 <div><pre><code class="language-none">[self.loginManager signInWithType:LTPlatformWeixin fromViewController:self callback:^(LTUser *loginUser) {
         if (loginUser.stateCode == LTLoginSuccess) {
@@ -779,78 +902,7 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
         }
     }];</code></pre></div>
 
-<h2 id="toc_3">第四步，使用带UI的登录功能</h2>
-
-<p>一，使用SDK的登录UI<br>
-1&gt;在要使用UI登录功能的UIViewController中导入头文件</p>
-
-<div><pre><code class="language-none">#import &lt;SDKUIKYCC/LTUIManager.h&gt;
-#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
-
-<p>2&gt;设置用户协议和隐私条款连接地址</p>
-
-<div><pre><code class="language-none">[[LTUIManager sharedInstance] linkOfUserAgreement:@&quot;https://github.com/&quot;
-                                   andPrivacyLine:@&quot;https://www.baidu.com/&quot;];</code></pre></div>
-
-<p>3&gt;调用UI界面进行显示<br>
-&nbsp;&nbsp;&nbsp;&nbsp;1,显示游客登录按钮</p>
-
-<div><pre><code class="language-none">[[LTUIManager sharedInstance] showLoginUI:self withBlock:^(LTUser * _Nonnull loginUser) {
-        if (loginUser.stateCode == LTLoginSuccess) {
-            NSString *lt_UID = loginUser.LT_UID;
-            NSString *LTUidToken = loginUser.LTUidToken;
-            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
-        }else if (loginUser.stateCode == LTLoginCancel){
-            NSLog(@&quot;用户取消了登录&quot;);
-        }else if (loginUser.stateCode == LTLoginFailed){
-            NSLog(@&quot;登录失败&quot;);
-        }
-    }  showTourist:YES];</code></pre></div>
-
-<p>&nbsp;&nbsp;&nbsp;&nbsp;2,不显示游客登录按钮</p>
-
-<div><pre><code class="language-none">[[LTUIManager sharedInstance] showLoginUI:self withBlock:^(LTUser * _Nonnull loginUser) {
-        if (loginUser.stateCode == LTLoginSuccess) {
-            NSString *lt_UID = loginUser.LT_UID;
-            NSString *LTUidToken = loginUser.LTUidToken;
-            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
-        }else if (loginUser.stateCode == LTLoginCancel){
-            NSLog(@&quot;用户取消了登录&quot;);
-        }else if (loginUser.stateCode == LTLoginFailed){
-            NSLog(@&quot;登录失败&quot;);
-        }
-    } showTourist:NO];</code></pre></div>
-
-<p>二,如何退出登录</p>
-
-<p>1&gt;清除数据并弹出SDK登录界面</p>
-
-<div><pre><code class="language-none">[[LTUIManager sharedInstance] userLogoutWithUI:self withBlock:^(LTUser * _Nonnull loginUser) {
-        if (loginUser.stateCode == LTLoginSuccess) {
-            NSString *lt_UID = loginUser.LT_UID;
-            NSString *LTUidToken = loginUser.LTUidToken;
-            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
-        }else if (loginUser.stateCode == LTLoginCancel){
-            NSLog(@&quot;用户取消了登录&quot;);
-        }else if (loginUser.stateCode == LTLoginFailed){
-            NSLog(@&quot;登录失败&quot;);
-        }
-    }];</code></pre></div>
-
-<p>2&gt;只清除数据，不弹出SDK登录界面</p>
-
-<div><pre><code class="language-none">[[LTSDKLoginManager sharedInstance] userLogout];</code></pre></div>
-
-<p>3,获取用户信息</p>
-
-<div><pre><code class="language-none">    LTUser *current = [[LTLoginManager sharedInstance] getUserInfo];
-    if (current.stateCode == LTLoginSuccess) {
-        NSString *lt_UID = current.LT_UID;
-        NSString *LTUidToken = current.LTUidToken;
-        NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
-    }</code></pre></div>
-
-<h2 id="toc_4">第五步，手机登录相关</h2>
+<h2 id="toc_6">第五步，手机登录相关</h2>
 
 <p>在要使用手机登录相关功能的.m文件中导入头文件</p>
 
