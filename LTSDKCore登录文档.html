@@ -583,20 +583,16 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
 
 <h2 id="toc_1">第二步，初始化LT应用</h2>
 
-<p>1，在APPdelegate.h文件中导入头文件</p>
+<p>1，在APPdelegate.m文件中导入头文件</p>
 
 <div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;</code></pre></div>
 
-<p>2,在AppDelegate.m文件添加属性变量<br></p>
-
-<div><pre><code class="language-none">@property (strong, nonatomic) LTLoginManager *loginManager;</code></pre></div>
-
-<p>3,初始化应用,在AppDelegate.m的didFinishLaunchingWithOptions方法中添加如下代码<br>
+<p>2,初始化应用,在AppDelegate.m的didFinishLaunchingWithOptions方法中添加如下代码<br>
 <font color="#ff0000"><em>上线前请确认isDevelopmentModel的参数值为&nbsp;NO</em></font><br /> <br></p>
 
-<div><pre><code class="language-none">[self.loginManager registLTAppID:@&quot;从乐推平台申请的应用ID&quot; appkey:@&quot;从乐推平台申请的应用AppKey&quot; isDevelopmentModel:YES];</code></pre></div>
+<div><pre><code class="language-none">[[LTLoginManager sharedInstance] registLTAppID:@&quot;从乐推平台申请的应用ID&quot; appkey:@&quot;从乐推平台申请的应用AppKey&quot; isDevelopmentModel:YES];</code></pre></div>
 
-<p>4,在AppDelegate.m文件添加应用回调<br></p>
+<p>3,在AppDelegate.m文件添加应用回调<br></p>
 
 <div><pre><code class="language-none">-(BOOL)application:(UIApplication *)app
            openURL:(NSURL *)url
