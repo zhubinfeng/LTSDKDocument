@@ -530,6 +530,11 @@ div.prism-show-language > div.prism-show-language-label {
 <td>新增Sign in with Apple登录</td>
 <td>使用LTPlatformApple标识Apple登录类型</td>
 </tr>
+<tr>
+<td>1.0.4</td>
+<td>新增第三方账户绑定与解绑功能</td>
+<td>bindTouristWithType与unbindTouristWithCallback</td>
+</tr>
 </tbody>
 </table>
 
@@ -955,6 +960,39 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
     [[LTPhoneManager sharedInstance] resetPassword:^(NSDictionary * _Nonnull resultInfo) {
         NSString *msg = resultInfo[@&quot;msg&quot;];
     } withPhoneNumber:phoneNumber withAuthCode:authCode withPassword:passsword];</code></pre></div>
+
+<h2 id="toc_10">第六步，绑定与解绑</h2>
+
+<p>1，在要使用绑定功能的UIViewController中导入头文件</p>
+
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
+#import &lt;LTGameSDKCore/LTUser.h&gt;</code></pre></div>
+
+<p>2，绑定调用（LTPlatformXXX代表对应的第三方平台）</p>
+
+<div><pre><code class="language-none">[[LTLoginManager sharedInstance] bindTouristWithType:LTPlatformXXX fromViewController:self callback:^(LTUser *loginUser) {
+        if (loginUser.stateCode == LTLoginSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTLoginCancel){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }else if (loginUser.stateCode == LTLoginFailed){
+            NSLog(@&quot;登录失败&quot;);
+        }
+    }];</code></pre></div>
+
+<p>3，解绑调用</p>
+
+<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] unbindTouristWithCallback:^(LTUser * _Nonnull loginUser) {
+        if (loginUser.stateCode == LTUnbindSuccess) {
+            NSString *lt_UID = loginUser.LT_UID;
+            NSString *LTUidToken = loginUser.LTUidToken;
+            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
+        }else if (loginUser.stateCode == LTUnbindFailed){
+            NSLog(@&quot;用户取消了登录&quot;);
+        }
+    }];</code></pre></div>
 
 
 
