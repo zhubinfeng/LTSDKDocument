@@ -535,6 +535,11 @@ div.prism-show-language > div.prism-show-language-label {
 <td>新增第三方账户绑定与解绑功能</td>
 <td>bindTouristWithType与unbindTouristWithCallback</td>
 </tr>
+<tr>
+<td>1.0.5</td>
+<td>新增用户与游戏角色关联、新增手动统计事件</td>
+<td>bindGameUserAndLTUser与unbindTouristWithCallback</td>
+</tr>
 </tbody>
 </table>
 
@@ -586,7 +591,7 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
 <p>3,配置Sign in with Apple
 <img src="https://github.com/zhubinfeng/LTSDKDocument/blob/master/PicResource/add_sign_in_with_apple.png?raw=true" alt=""></p>
 
-<h2 id="toc_1">第二步，初始化LT应用</h2>
+<h2 id="toc_1">第二步，初始化LT应用并激活Facebook统计</h2>
 
 <p>1，在APPdelegate.m文件中导入头文件</p>
 
@@ -605,6 +610,10 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
     [[LTLoginManager sharedInstance] LTPlatformApplication:app openURL:url ptions:options];
     return YES;
 }</code></pre></div>
+
+<p>4,初始化应用,在AppDelegate.m的applicationDidBecomeActive方法中添加如下代码<br></p>
+
+<div><pre><code class="language-none">[[LTLoginManager sharedInstance] activateAppEvents];</code></pre></div>
 
 <h2 id="toc_2">第三步，使用带UI的登录功能</h2>
 
@@ -700,6 +709,26 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
             NSLog(@&quot;User not login.&quot;);
         }
     }];</code></pre></div>
+
+<p>5,关联帐号和角色的数据
+1&gt;在要使用UI登录功能的UIViewController中导入头文件</p>
+
+<div><pre><code class="language-none">#import &lt;LTGameSDKCore/LTLoginManager.h&gt;
+#import &lt;LTGameSDKCore/LTGameUserModel.h&gt;</code></pre></div>
+
+<p>2&gt;传值并调用
+<code>
+    LTGameUserModel *gameUser = [[LTGameUserModel alloc] init];
+    //游戏内角色ID
+    gameUser.gameUserID = @&quot;321123&quot;;
+    //游戏内角色昵称
+    gameUser.gameUserName =  @&quot;peak&quot;;
+    //&quot;1&quot; 代表男 ”0“代表女
+    gameUser.gameUserSex = @&quot;1&quot;;
+    //SDK 返回的用户ID
+    gameUser.LTUserID = @&quot;131&quot;;
+    [[LTLoginManager sharedInstance] bindGameUserAndLTUser:gameUser];
+</code></p>
 
 <h2 id="toc_5">第四步，集成对应的第三平台（不使用SDK的UI）</h2>
 
@@ -964,7 +993,7 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
         NSString *msg = resultInfo[@&quot;msg&quot;];
     } withPhoneNumber:phoneNumber withAuthCode:authCode withPassword:passsword];</code></pre></div>
 
-<h2 id="toc_7">第六步，绑定与解绑</h2>
+<h2 id="toc_7">第六步，绑定</h2>
 
 <p>1，在要使用绑定功能的UIViewController中导入头文件</p>
 
@@ -982,18 +1011,6 @@ Build Setting -&gt; Other Linker Flags 添加-ObjC
             NSLog(@&quot;用户取消了登录&quot;);
         }else if (loginUser.stateCode == LTLoginFailed){
             NSLog(@&quot;登录失败&quot;);
-        }
-    }];</code></pre></div>
-
-<p>3，解绑调用</p>
-
-<div><pre><code class="language-none">    [[LTLoginManager sharedInstance] unbindTouristWithCallback:^(LTUser * _Nonnull loginUser) {
-        if (loginUser.stateCode == LTUnbindSuccess) {
-            NSString *lt_UID = loginUser.LT_UID;
-            NSString *LTUidToken = loginUser.LTUidToken;
-            NSLog(@&quot;LT_UID is %@ ::: LT_UID_Token is %@&quot;,lt_UID,LTUidToken);
-        }else if (loginUser.stateCode == LTUnbindFailed){
-            NSLog(@&quot;用户取消了登录&quot;);
         }
     }];</code></pre></div>
 
