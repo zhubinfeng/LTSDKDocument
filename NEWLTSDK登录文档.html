@@ -548,14 +548,13 @@ xxxxxxxxx为从对应平台申请到的应用ID</p>
 
 <div><pre><code class="language-none">#import &lt;LTGameSDK/LTLoginManager.h&gt;</code></pre></div>
 
-<p>2,初始化应用,在AppDelegate.m的didFinishLaunchingWithOptions方法中添加如下代码<br>
-<font color="#ff0000"><em>上线前请确认isDevelopmentModel的参数值为&nbsp;NO</em></font><br /> <br></p>
+<p>2,初始化应用,在AppDelegate.m的didFinishLaunchingWithOptions方法中添加如下代码<br></p>
 
 <div><pre><code class="language-none">    LTThirdPlatformModel *LTModel = [[LTThirdPlatformModel alloc] init];
     LTModel.LTPlatformID = @&quot;从乐推平台申请的应用ID&quot;;
     LTModel.LTPlatformKey = @&quot;从乐推平台申请的应用AppKey&quot;;
-    LTModel.privacyURL = @&quot;https://www.baidu.com/&quot;;
-    LTModel.userAgreementURL = @&quot;https://www.apple.com.cn/&quot;;
+    LTModel.privacyURL = @&quot;https://隐私条款地址/&quot;;
+    LTModel.userAgreementURL = @&quot;https://用户协议地址/&quot;;
     [[LTLoginManager sharedInstance] initWithModel:LTModel isDebug:NO isDev:YES];</code></pre></div>
 
 <ul>
